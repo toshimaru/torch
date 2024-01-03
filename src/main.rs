@@ -1,8 +1,9 @@
-use std::fs;
+use std::fs::{OpenOptions, create_dir_all};
 use std::io::Result;
+use filetime::{FileTime, set_file_times};
 
 fn main() {
-    match fs::create_dir_all("my_directory") {
+    match create_dir_all("my_directory") {
         Ok(_) => println!("Directory created successfully"),
         Err(e) => println!("Error creating directory: {}", e),
     }
@@ -13,9 +14,11 @@ fn main() {
 }
 
 fn touch(path: &str) -> Result<()> {
-    fs::OpenOptions::new()
+    OpenOptions::new()
         .create(true)
         .write(true)
         .open(path)?;
+    let now: FileTime = FileTime::now();
+    set_file_times(path, now, now)?;
     Ok(())
 }
