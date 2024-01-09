@@ -1,7 +1,7 @@
-use std::fs::{OpenOptions, create_dir_all};
-use std::io::Result;
-use filetime::{FileTime, set_file_times};
 use clap::Parser;
+use filetime::{set_file_times, FileTime};
+use std::fs::{create_dir_all, OpenOptions};
+use std::io::Result;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -25,10 +25,7 @@ fn main() {
 }
 
 fn touch(path: &str) -> Result<()> {
-    OpenOptions::new()
-        .create(true)
-        .write(true)
-        .open(path)?;
+    OpenOptions::new().create(true).write(true).open(path)?;
     let now: FileTime = FileTime::now();
     set_file_times(path, now, now)?;
     Ok(())
@@ -37,9 +34,9 @@ fn touch(path: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::Path;
     use std::fs;
     use std::fs::metadata;
+    use std::path::Path;
     use std::thread;
     use std::time::Duration;
 
