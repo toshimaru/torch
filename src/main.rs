@@ -2,6 +2,7 @@ use clap::Parser;
 use filetime::{set_file_times, FileTime};
 use std::fs::{create_dir_all, OpenOptions};
 use std::io::Result;
+use std::path::Path;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -12,15 +13,22 @@ struct Args {
 fn main() {
     let args = Args::parse();
     for file in args.files {
+        // Create directory if it contains directories
+        if file.contains('/') {
+            let path = Path::new(&file);
+            if let Some(parent) = path.parent() {
+                match create_dir_all(parent) {
+                    Ok(_) => println!("Directory({}) created successfully", parent.display()),
+                    Err(e) => println!("Error creating directory({}): {}", parent.display(), e),
+                }
+            }
+        }
+
+        // Create file
         match touch(file.as_str()) {
             Ok(_) => println!("File created successfully"),
-            Err(e) => println!("Error creating file: {}", e),
+            Err(e) => println!("Error creating file({}): {}", file, e),
         }
-    }
-
-    match create_dir_all("my_directory") {
-        Ok(_) => println!("Directory created successfully"),
-        Err(e) => println!("Error creating directory: {}", e),
     }
 }
 
