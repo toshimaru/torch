@@ -16,10 +16,12 @@ fn main() {
         // Create directory if it contains directories
         if file.contains('/') {
             let path = Path::new(&file);
-            if let Some(parent) = path.parent() {
-                match create_dir_all(parent) {
-                    Ok(_) => println!("Directory({}) created successfully", parent.display()),
-                    Err(e) => println!("Error creating directory({}): {}", parent.display(), e),
+            if let Some(dir) = path.parent() {
+                match mkdir(dir) {
+                    Ok(_) => println!("Directory({}) created successfully", dir.display()),
+                    Err(e) => {
+                        println!("Error creating directory({}): {}", dir.display(), e)
+                    }
                 }
             }
         }
@@ -32,6 +34,11 @@ fn main() {
     }
 }
 
+fn mkdir(dir: &Path) -> Result<()> {
+    create_dir_all(dir)?;
+    Ok(())
+}
+
 fn touch(path: &str) -> Result<()> {
     OpenOptions::new().create(true).write(true).open(path)?;
     let now: FileTime = FileTime::now();
@@ -42,30 +49,46 @@ fn touch(path: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
     use std::fs::metadata;
-    use std::path::Path;
+    use std::fs::{remove_dir_all, remove_file, File};
     use std::thread;
     use std::time::Duration;
 
     #[test]
     fn test_touch_creates_file() {
-        let test_path = format!("{}.txt", std::module_path!());
-        assert!(!Path::new(&test_path).exists());
-        assert!(touch(&test_path).is_ok());
-        assert!(Path::new(&test_path).exists());
-        fs::remove_file(test_path).unwrap();
+        let test_path = "test_touch_creates_file";
+        assert!(!Path::new(test_path).exists());
+        assert!(touch(test_path).is_ok());
+        assert!(Path::new(test_path).exists());
+        remove_file(test_path).unwrap();
     }
 
     #[test]
     fn test_touch_updates_timestamp() {
-        let test_path = format!("{}.txt", std::module_path!());
-        fs::File::create(&test_path).unwrap();
+        let test_path = "test_touch_updates_timestamp";
+        File::create(test_path).unwrap();
         thread::sleep(Duration::from_secs(1));
-        assert!(touch(&test_path).is_ok());
-        let metadata = metadata(&test_path).unwrap();
+        assert!(touch(test_path).is_ok());
+        let metadata = metadata(test_path).unwrap();
         let modified_time = FileTime::from_last_modification_time(&metadata);
         assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
-        fs::remove_file(test_path).unwrap();
+        remove_file(test_path).unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_success() {
+        let dir = Path::new("test_mkdir_success");
+        assert!(!dir.exists());
+        assert!(mkdir(dir).is_ok());
+        assert!(dir.exists());
+        remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_already_exists() {
+        let existing_dir = Path::new("test_mkdir_already_exists");
+        create_dir_all(existing_dir).unwrap();
+        assert!(mkdir(existing_dir).is_ok());
+        remove_dir_all(existing_dir).unwrap();
     }
 }
