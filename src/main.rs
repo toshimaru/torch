@@ -52,7 +52,7 @@ mod tests {
     fn test_touch_creates_file() {
         let test_path = format!("{}.txt", std::module_path!());
         assert!(!Path::new(&test_path).exists());
-        touch(&test_path).unwrap();
+        assert!(touch(&test_path).is_ok());
         assert!(Path::new(&test_path).exists());
         fs::remove_file(test_path).unwrap();
     }
@@ -62,7 +62,7 @@ mod tests {
         let test_path = format!("{}.txt", std::module_path!());
         fs::File::create(&test_path).unwrap();
         thread::sleep(Duration::from_secs(1));
-        touch(&test_path).unwrap();
+        assert!(touch(&test_path).is_ok());
         let metadata = metadata(&test_path).unwrap();
         let modified_time = FileTime::from_last_modification_time(&metadata);
         assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
