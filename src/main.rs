@@ -20,7 +20,7 @@ fn main() {
         if path.contains('/') {
             if let Some(dir) = p.parent() {
                 match mkdir(dir) {
-                    Ok(_) => println!("Directory({}) created successfully", dir.display()),
+                    Ok(_) => {},
                     Err(e) => {
                         println!("Error creating directory({}): {}", dir.display(), e)
                     }
@@ -30,19 +30,23 @@ fn main() {
 
         // Create file
         match touch(p) {
-            Ok(_) => println!("File created successfully"),
+            Ok(_) => {},
             Err(e) => println!("Error creating file({}): {}", path, e),
         }
     }
 }
 
 fn mkdir(dir: &Path) -> Result<()> {
-    create_dir_all(dir)?;
+    if !dir.exists() {
+        create_dir_all(dir)?;
+    }
     Ok(())
 }
 
 fn touch(path: &Path) -> Result<()> {
-    OpenOptions::new().create(true).write(true).open(path)?;
+    if !path.exists() {
+        OpenOptions::new().create(true).write(true).open(path)?;
+    }
     let now: FileTime = FileTime::now();
     set_file_times(path, now, now)?;
     Ok(())
