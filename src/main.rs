@@ -7,15 +7,16 @@ use std::path::Path;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    files: Vec<String>,
+    paths: Vec<String>,
 }
 
 fn main() {
     let args = Args::parse();
-    for file in args.files {
+
+    for path in args.paths {
         // Create directory if it contains directories
-        if file.contains('/') {
-            let path = Path::new(&file);
+        if path.contains('/') {
+            let path = Path::new(&path);
             if let Some(dir) = path.parent() {
                 match mkdir(dir) {
                     Ok(_) => println!("Directory({}) created successfully", dir.display()),
@@ -27,9 +28,9 @@ fn main() {
         }
 
         // Create file
-        match touch(file.as_str()) {
+        match touch(path.as_str()) {
             Ok(_) => println!("File created successfully"),
-            Err(e) => println!("Error creating file({}): {}", file, e),
+            Err(e) => println!("Error creating file({}): {}", path, e),
         }
     }
 }
