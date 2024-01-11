@@ -14,10 +14,11 @@ fn main() {
     let args = Args::parse();
 
     for path in args.paths {
+        let p = Path::new(&path);
+
         // Create directory if it contains directories
         if path.contains('/') {
-            let path = Path::new(&path);
-            if let Some(dir) = path.parent() {
+            if let Some(dir) = p.parent() {
                 match mkdir(dir) {
                     Ok(_) => println!("Directory({}) created successfully", dir.display()),
                     Err(e) => {
@@ -28,7 +29,7 @@ fn main() {
         }
 
         // Create file
-        match touch(path.as_str()) {
+        match touch(p) {
             Ok(_) => println!("File created successfully"),
             Err(e) => println!("Error creating file({}): {}", path, e),
         }
@@ -40,7 +41,7 @@ fn mkdir(dir: &Path) -> Result<()> {
     Ok(())
 }
 
-fn touch(path: &str) -> Result<()> {
+fn touch(path: &Path) -> Result<()> {
     OpenOptions::new().create(true).write(true).open(path)?;
     let now: FileTime = FileTime::now();
     set_file_times(path, now, now)?;
@@ -57,7 +58,7 @@ mod tests {
 
     #[test]
     fn test_touch_creates_file() {
-        let test_path = "test_touch_creates_file";
+        let test_path = Path::new("test_touch_creates_file");
         assert!(!Path::new(test_path).exists());
         assert!(touch(test_path).is_ok());
         assert!(Path::new(test_path).exists());
@@ -66,7 +67,7 @@ mod tests {
 
     #[test]
     fn test_touch_updates_timestamp() {
-        let test_path = "test_touch_updates_timestamp";
+        let test_path =  Path::new("test_touch_updates_timestamp");
         File::create(test_path).unwrap();
         thread::sleep(Duration::from_secs(1));
         assert!(touch(test_path).is_ok());
