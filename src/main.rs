@@ -12,9 +12,16 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
+    let mut has_err = false;
 
     for path in args.paths {
-        mkdir_touch(&path);
+        if !mkdir_touch(&path) {
+            has_err = true;
+        }
+    }
+
+    if has_err {
+        std::process::exit(1);
     }
 }
 
