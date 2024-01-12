@@ -72,23 +72,35 @@ mod tests {
 
     #[test]
     fn test_touch_creates_file() {
-        let test_path = Path::new("test_touch_creates_file");
-        assert!(!Path::new(test_path).exists());
-        assert!(touch(test_path).is_ok());
-        assert!(Path::new(test_path).exists());
-        remove_file(test_path).unwrap();
+        let path = Path::new("test_touch_creates_file");
+        assert!(!Path::new(path).exists());
+        assert!(touch(path).is_ok());
+        assert!(Path::new(path).exists());
+        remove_file(path).unwrap();
     }
 
     #[test]
     fn test_touch_updates_timestamp() {
-        let test_path = Path::new("test_touch_updates_timestamp");
-        File::create(test_path).unwrap();
+        let path = Path::new("test_touch_updates_timestamp");
+        File::create(path).unwrap();
         thread::sleep(Duration::from_secs(1));
-        assert!(touch(test_path).is_ok());
-        let metadata = metadata(test_path).unwrap();
+        assert!(touch(path).is_ok());
+        let metadata = metadata(path).unwrap();
         let modified_time = FileTime::from_last_modification_time(&metadata);
         assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
-        remove_file(test_path).unwrap();
+        remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn test_touch_updates_timestamp_for_directory() {
+        let dir = Path::new("test_touch_updates_timestamp_for_directory");
+        create_dir_all(dir).unwrap();
+        thread::sleep(Duration::from_secs(1));
+        assert!(touch(dir).is_ok());
+        let metadata = metadata(dir).unwrap();
+        let modified_time = FileTime::from_last_modification_time(&metadata);
+        assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
+        remove_dir_all(dir).unwrap();
     }
 
     #[test]
