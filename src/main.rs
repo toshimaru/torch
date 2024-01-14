@@ -34,7 +34,7 @@ fn mkdir_touch(path: &str) -> bool {
             match mkdir(dir) {
                 Ok(_) => {}
                 Err(e) => {
-                    println!("Error creating directory({}): {}", dir.display(), e);
+                    eprintln!("Error creating a directory({}): {}", dir.display(), e);
                     return false;
                 }
             }
@@ -45,7 +45,7 @@ fn mkdir_touch(path: &str) -> bool {
     match touch(p) {
         Ok(_) => {}
         Err(e) => {
-            println!("Error creating file({}): {}", path, e);
+            eprintln!("Error creating a file({}): {}", path, e);
             return false;
         }
     }
