@@ -177,7 +177,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "torch"
+name = "torch-cmd"
 version = "0.1.0"
 dependencies = [
  "clap",

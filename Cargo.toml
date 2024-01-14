@@ -1,7 +1,19 @@
 [package]
-name = "torch"
+name = "torch-cmd"
 version = "0.1.0"
 edition = "2021"
+authors = ["Toshimaru <me@toshimaru.net>"]
+license = "MIT"
+description = "mkdir + touch command"
+readme = "README.md"
+homepage = "https://github.com/toshimaru/torch"
+repository = "https://github.com/toshimaru/torch"
+keywords = ["cli", "mkdir", "touch"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "torch"
+path = "src/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
