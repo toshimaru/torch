@@ -3,3 +3,9 @@
 # torch
 
 `mkdir` + `touch` command.
+
+## Install
+
+```console
+$ cargo install torch-cmd
+```
