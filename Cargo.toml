@@ -19,7 +19,7 @@ path = "src/main.rs"
 
 [dependencies]
 filetime = "0.2.23"
-clap = { version = "4.4.17", features = ["derive"] }
+clap = { version = "4.4.18", features = ["derive"] }
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
