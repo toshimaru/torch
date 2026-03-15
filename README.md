@@ -1,35 +1,97 @@
-[![.github/workflows/test.yml](https://github.com/toshimaru/torch/actions/workflows/test.yml/badge.svg)](https://github.com/toshimaru/torch/actions/workflows/test.yml)
+[![Test](https://github.com/toshimaru/torch/actions/workflows/test.yml/badge.svg)](https://github.com/toshimaru/torch/actions/workflows/test.yml)
 [![Version](https://img.shields.io/crates/v/torch-cmd.svg)](https://crates.io/crates/torch-cmd)
 
 # torch
 
-`torch` = `mkdir` + `touch`.
+`torch` is a small CLI that combines `mkdir -p` and `touch`.
 
-`torch` command is `touch` a file with making directories.
+It creates parent directories when needed, then creates the file.
 
-## Motivation
+## Why
 
-When you want to create a file in a directory that does not exist, you need to create the directory first.
+Creating a file in a nested path usually takes two commands:
 
 ```console
 $ mkdir -p path/to
-$ touch path/to/file
+$ touch path/to/file.txt
 ```
 
-I want to do this in one command.
+`torch` reduces that to one:
 
-It's a bit annoying to type `mkdir -p` and `touch` separately, so I created `torch` command.
+```console
+$ torch path/to/file.txt
+```
+
+## What it does
+
+Given one or more paths, `torch`:
+
+- creates missing parent directories
+- creates the target file if it does not exist
+- updates the access and modification times if it already exists
+- exits with a non-zero status if any path fails
+
+## Usage
+
+```console
+$ torch <PATH>...
+```
+
+Examples:
+
+```console
+$ torch notes/today.md
+$ torch app/models/user.rb app/controllers/users_controller.rb
+$ torch tmp/output.log
+```
+
+This command:
+
+```console
+$ torch docs/guides/getting-started.md
+```
+
+is roughly equivalent to:
+
+```console
+$ mkdir -p docs/guides
+$ touch docs/guides/getting-started.md
+```
+
+To see the built-in CLI help:
+
+```console
+$ torch --help
+```
 
 ## Install
 
-### via Cargo
+### Cargo
 
 ```console
 $ cargo install torch-cmd
 ```
 
-### via Homebrew
+### Homebrew
 
 ```console
 $ brew install toshimaru/homebrew-torch/torch-cmd
 ```
+
+## Development
+
+Run the test suite:
+
+```console
+$ cargo test
+```
+
+Run the CLI locally:
+
+```console
+$ cargo run -- path/to/file.txt
+```
+
+## License
+
+MIT
