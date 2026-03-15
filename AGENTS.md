@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Project Structure
+
+Entrypoint and tests: [src/main.rs](src/main.rs). Package metadata and dependencies: [Cargo.toml](Cargo.toml). CI: [.github/workflows](.github/workflows). Do not edit `target/` or generated `target/distrib` outputs manually.
+
 ## Commands
 
 - **Build:** `cargo build`
