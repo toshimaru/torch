@@ -29,8 +29,8 @@ fn mkdir_touch(path: &str) -> bool {
     let p = Path::new(&path);
 
     // Create directory if it contains directories
-    if path.contains('/') {
-        if let Some(dir) = p.parent() {
+    if path.contains('/')
+        && let Some(dir) = p.parent() {
             match mkdir(dir) {
                 Ok(_) => {}
                 Err(e) => {
@@ -39,7 +39,6 @@ fn mkdir_touch(path: &str) -> bool {
                 }
             }
         }
-    }
 
     // Create file
     match touch(p) {
