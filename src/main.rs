@@ -14,10 +14,8 @@ fn main() {
     let args = Args::parse();
     let mut has_err = false;
 
-    for path in args.paths {
-        if !mkdir_touch(&path) {
-            has_err = true;
-        }
+    for path in &args.paths {
+        has_err |= !mkdir_touch(path);
     }
 
     if has_err {
