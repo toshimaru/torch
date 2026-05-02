@@ -63,9 +63,8 @@ fn touch(path: &Path) -> Result<()> {
             .truncate(false)
             .open(path)?;
     }
-    let now: FileTime = FileTime::now();
-    set_file_times(path, now, now)?;
-    Ok(())
+    let now = FileTime::now();
+    set_file_times(path, now, now)
 }
 
 #[cfg(test)]
