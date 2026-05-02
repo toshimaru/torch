@@ -28,6 +28,24 @@ fn main() {
 fn mkdir_touch(path: &str) -> bool {
     let p = Path::new(&path);
 
+    if path.ends_with('/') {
+        match mkdir(p) {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Error creating a directory({}): {}", p.display(), e);
+                return false;
+            }
+        }
+        match touch(p) {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Error creating a directory({}): {}", p.display(), e);
+                return false;
+            }
+        }
+        return true;
+    }
+
     // Create directory if it contains directories
     if path.contains('/')
         && let Some(dir) = p.parent()
@@ -168,6 +186,40 @@ mod tests {
         assert!(!mkdir_touch(&create_path));
         assert!(!Path::new(&create_path).exists());
         remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_touch_trailing_slash_creates_directory() {
+        let path = "test_mkdir_touch_trailing_slash/";
+        remove_dir_all("test_mkdir_touch_trailing_slash").ok();
+        assert!(mkdir_touch(path));
+        let meta = metadata("test_mkdir_touch_trailing_slash").unwrap();
+        assert!(meta.is_dir());
+        remove_dir_all("test_mkdir_touch_trailing_slash").unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_touch_trailing_slash_nested() {
+        let path = "test_mkdir_touch_trailing_slash_nested/a/b/c/";
+        remove_dir_all("test_mkdir_touch_trailing_slash_nested").ok();
+        assert!(mkdir_touch(path));
+        let meta = metadata("test_mkdir_touch_trailing_slash_nested/a/b/c").unwrap();
+        assert!(meta.is_dir());
+        remove_dir_all("test_mkdir_touch_trailing_slash_nested").unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_touch_trailing_slash_existing_dir() {
+        let dir = "test_mkdir_touch_trailing_slash_existing_dir";
+        remove_dir_all(dir).ok();
+        create_dir_all(dir).unwrap();
+        thread::sleep(Duration::from_secs(1));
+        let path = format!("{}/", dir);
+        assert!(mkdir_touch(&path));
+        let metadata = metadata(dir).unwrap();
+        let modified_time = FileTime::from_last_modification_time(&metadata);
+        assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
+        remove_dir_all(dir).unwrap();
     }
 
     mod integration_tests {

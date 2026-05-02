@@ -29,6 +29,7 @@ Given one or more paths, `torch`:
 - creates missing parent directories
 - creates the target file if it does not exist
 - updates the access and modification times if it already exists
+- if a path ends with `/`, creates a directory (recursively) instead of a file
 - exits with a non-zero status if any path fails
 
 ## Usage
@@ -43,6 +44,7 @@ Examples:
 $ torch notes/today.md
 $ torch app/models/user.rb app/controllers/users_controller.rb
 $ torch tmp/output.log
+$ torch docs/guides/
 ```
 
 This command:
