@@ -62,7 +62,11 @@ fn mkdir(dir: &Path) -> Result<()> {
 
 fn touch(path: &Path) -> Result<()> {
     if !path.exists() {
-        OpenOptions::new().create(true).write(true).open(path)?;
+        OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(path)?;
     }
     let now: FileTime = FileTime::now();
     set_file_times(path, now, now)?;
