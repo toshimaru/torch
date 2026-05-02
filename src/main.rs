@@ -54,10 +54,7 @@ fn mkdir_touch(path: &str) -> bool {
 }
 
 fn mkdir(dir: &Path) -> Result<()> {
-    if !dir.exists() {
-        create_dir_all(dir)?;
-    }
-    Ok(())
+    create_dir_all(dir)
 }
 
 fn touch(path: &Path) -> Result<()> {
@@ -216,9 +213,7 @@ mod tests {
             let stdout = String::from_utf8_lossy(&output.stdout);
             let stderr = String::from_utf8_lossy(&output.stderr);
             assert_eq!(stdout, "");
-            assert!(stderr.contains(
-                "Error creating a file(test_fail_not_a_directory/test.txt): Not a directory"
-            ));
+            assert!(stderr.contains("Error creating a directory(test_fail_not_a_directory):"));
             remove_file(path).unwrap();
         }
     }
