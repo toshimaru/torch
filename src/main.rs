@@ -1,6 +1,6 @@
 use clap::Parser;
-use filetime::{set_file_times, FileTime};
-use std::fs::{create_dir_all, OpenOptions};
+use filetime::{FileTime, set_file_times};
+use std::fs::{OpenOptions, create_dir_all};
 use std::io::Result;
 use std::path::Path;
 
@@ -77,7 +77,7 @@ fn touch(path: &Path) -> Result<()> {
 mod tests {
     use super::*;
     use std::fs::metadata;
-    use std::fs::{remove_dir_all, remove_file, File};
+    use std::fs::{File, remove_dir_all, remove_file};
     use std::thread;
     use std::time::Duration;
 
