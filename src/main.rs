@@ -1,6 +1,6 @@
 use clap::Parser;
-use filetime::{set_file_times, FileTime};
-use std::fs::{create_dir_all, OpenOptions};
+use filetime::{FileTime, set_file_times};
+use std::fs::{OpenOptions, create_dir_all};
 use std::io::Result;
 use std::path::Path;
 
@@ -29,14 +29,14 @@ fn mkdir_touch(path: &str) -> bool {
     let p = Path::new(&path);
 
     // Create directory if it contains directories
-    if path.contains('/') {
-        if let Some(dir) = p.parent() {
-            match mkdir(dir) {
-                Ok(_) => {}
-                Err(e) => {
-                    eprintln!("Error creating a directory({}): {}", dir.display(), e);
-                    return false;
-                }
+    if path.contains('/')
+        && let Some(dir) = p.parent()
+    {
+        match mkdir(dir) {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Error creating a directory({}): {}", dir.display(), e);
+                return false;
             }
         }
     }
@@ -77,7 +77,7 @@ fn touch(path: &Path) -> Result<()> {
 mod tests {
     use super::*;
     use std::fs::metadata;
-    use std::fs::{remove_dir_all, remove_file, File};
+    use std::fs::{File, remove_dir_all, remove_file};
     use std::thread;
     use std::time::Duration;
 
