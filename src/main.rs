@@ -30,15 +30,16 @@ fn mkdir_touch(path: &str) -> bool {
 
     // Create directory if it contains directories
     if path.contains('/')
-        && let Some(dir) = p.parent() {
-            match mkdir(dir) {
-                Ok(_) => {}
-                Err(e) => {
-                    eprintln!("Error creating a directory({}): {}", dir.display(), e);
-                    return false;
-                }
+        && let Some(dir) = p.parent()
+    {
+        match mkdir(dir) {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Error creating a directory({}): {}", dir.display(), e);
+                return false;
             }
         }
+    }
 
     // Create file
     match touch(p) {
