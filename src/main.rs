@@ -26,26 +26,19 @@ fn main() {
 fn mkdir_touch(path: &str) -> bool {
     let p = Path::new(path);
 
-    // Create directory if it contains directories
+    // Create parent directories
     if path.contains('/')
         && let Some(dir) = p.parent()
+        && let Err(e) = mkdir(dir)
     {
-        match mkdir(dir) {
-            Ok(_) => {}
-            Err(e) => {
-                eprintln!("Error creating a directory({}): {}", dir.display(), e);
-                return false;
-            }
-        }
+        eprintln!("Error creating a directory({}): {}", dir.display(), e);
+        return false;
     }
 
-    // Create file
-    match touch(p) {
-        Ok(_) => {}
-        Err(e) => {
-            eprintln!("Error creating a file({}): {}", path, e);
-            return false;
-        }
+    // Create a file
+    if let Err(e) = touch(p) {
+        eprintln!("Error creating a file({}): {}", path, e);
+        return false;
     }
 
     true
