@@ -179,6 +179,7 @@ mod tests {
         }
 
         #[test]
+        #[cfg(unix)]
         fn test_fail_permission_denied() {
             let output = run_command(&["/etc/denied"]);
             let stdout = String::from_utf8_lossy(&output.stdout);
@@ -188,6 +189,7 @@ mod tests {
         }
 
         #[test]
+        #[cfg(unix)]
         fn test_fail_operation_not_permitted() {
             let output = run_command(&["/etc/passwd"]);
             let stdout = String::from_utf8_lossy(&output.stdout);
