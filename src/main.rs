@@ -24,7 +24,7 @@ fn main() {
 }
 
 fn mkdir_touch(path: &str) -> bool {
-    let p = Path::new(&path);
+    let p = Path::new(path);
 
     // Create directory if it contains directories
     if path.contains('/')
