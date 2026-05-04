@@ -27,8 +27,8 @@ fn mkdir_touch(path: &str) -> bool {
     let p = Path::new(path);
 
     // Create parent directories
-    if path.contains('/')
-        && let Some(dir) = p.parent()
+    if let Some(dir) = p.parent()
+        && !dir.as_os_str().is_empty()
         && let Err(e) = mkdir(dir)
     {
         eprintln!("Error creating a directory({}): {}", dir.display(), e);
