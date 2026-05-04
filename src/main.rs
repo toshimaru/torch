@@ -14,10 +14,8 @@ fn main() {
     let args = Args::parse();
     let mut has_err = false;
 
-    for path in args.paths {
-        if !mkdir_touch(&path) {
-            has_err = true;
-        }
+    for path in &args.paths {
+        has_err |= !mkdir_touch(path);
     }
 
     if has_err {
@@ -54,10 +52,7 @@ fn mkdir_touch(path: &str) -> bool {
 }
 
 fn mkdir(dir: &Path) -> Result<()> {
-    if !dir.exists() {
-        create_dir_all(dir)?;
-    }
-    Ok(())
+    create_dir_all(dir)
 }
 
 fn touch(path: &Path) -> Result<()> {
@@ -68,9 +63,8 @@ fn touch(path: &Path) -> Result<()> {
             .truncate(false)
             .open(path)?;
     }
-    let now: FileTime = FileTime::now();
-    set_file_times(path, now, now)?;
-    Ok(())
+    let now = FileTime::now();
+    set_file_times(path, now, now)
 }
 
 #[cfg(test)]
@@ -216,9 +210,7 @@ mod tests {
             let stdout = String::from_utf8_lossy(&output.stdout);
             let stderr = String::from_utf8_lossy(&output.stderr);
             assert_eq!(stdout, "");
-            assert!(stderr.contains(
-                "Error creating a file(test_fail_not_a_directory/test.txt): Not a directory"
-            ));
+            assert!(stderr.contains("Error creating a directory(test_fail_not_a_directory):"));
             remove_file(path).unwrap();
         }
     }
