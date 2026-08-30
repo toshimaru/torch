@@ -34,7 +34,7 @@ fn mkdir_touch(path: &str) -> bool {
         p.parent().filter(|d| !d.as_os_str().is_empty())
     };
 
-    // Create parent directories
+    // Create the directories
     if let Some(dir) = dir
         && let Err(e) = mkdir(dir)
     {
