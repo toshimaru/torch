@@ -26,9 +26,16 @@ fn main() {
 fn mkdir_touch(path: &str) -> bool {
     let p = Path::new(path);
 
-    // Create parent directories
-    if let Some(dir) = p.parent()
-        && !dir.as_os_str().is_empty()
+    // A trailing separator means the path itself is a directory,
+    // otherwise only the parent directories need to be created
+    let dir = if path.ends_with(std::path::is_separator) {
+        Some(p)
+    } else {
+        p.parent().filter(|d| !d.as_os_str().is_empty())
+    };
+
+    // Create the directories
+    if let Some(dir) = dir
         && let Err(e) = mkdir(dir)
     {
         eprintln!("Error creating a directory({}): {}", dir.display(), e);
@@ -135,6 +142,46 @@ mod tests {
         remove_dir_all(dir).ok();
         assert!(mkdir_touch(&path));
         assert!(Path::new(&path).exists());
+        remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_touch_with_trailing_slash() {
+        let dir = "test_mkdir_touch_with_trailing_slash";
+        let path = format!("{}/", dir);
+        remove_dir_all(dir).ok();
+        assert!(mkdir_touch(&path));
+        assert!(Path::new(dir).is_dir());
+        remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_touch_with_trailing_slash_nested() {
+        let dir = "test_mkdir_touch_with_trailing_slash_nested";
+        let path = format!("{}/{}", dir, "a/b/");
+        remove_dir_all(dir).ok();
+        assert!(mkdir_touch(&path));
+        assert!(Path::new(&path).is_dir());
+        remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn test_mkdir_touch_with_trailing_slash_already_exists() {
+        let dir = "test_mkdir_touch_with_trailing_slash_already_exists";
+        create_dir_all(dir).unwrap();
+        assert!(mkdir_touch(&format!("{}/", dir)));
+        assert!(Path::new(dir).is_dir());
+        remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    #[cfg(windows)]
+    fn test_mkdir_touch_with_trailing_backslash() {
+        let dir = "test_mkdir_touch_with_trailing_backslash";
+        let path = format!("{}\\", dir);
+        remove_dir_all(dir).ok();
+        assert!(mkdir_touch(&path));
+        assert!(Path::new(dir).is_dir());
         remove_dir_all(dir).unwrap();
     }
 

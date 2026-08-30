@@ -28,6 +28,7 @@ Given one or more paths, `torch`:
 
 - creates missing parent directories
 - creates the target file if it does not exist
+- creates the path itself as a directory when it ends with a `/` (or `\` on Windows)
 - updates the access and modification times if it already exists
 - exits with a non-zero status if any path fails
 
@@ -43,6 +44,18 @@ Examples:
 $ torch notes/today.md
 $ torch app/models/user.rb app/controllers/users_controller.rb
 $ torch tmp/output.log
+```
+
+A path ending with `/` (or `\` on Windows) is created as a directory instead of a file:
+
+```console
+$ torch app/services/
+```
+
+is roughly equivalent to:
+
+```console
+$ mkdir -p app/services
 ```
 
 This command:
