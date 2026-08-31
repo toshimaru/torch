@@ -25,6 +25,6 @@ Dependencies: `clap` (CLI parsing with derive), `filetime` (timestamp manipulati
 
 Uses [cargo-dist](https://github.com/axodotdev/cargo-dist) for releases. Config in `dist-workspace.toml`.
 
-- Targets: macOS (aarch64, x86_64), Linux (aarch64, x86_64, musl), Windows (x86_64)
+- Targets: macOS (aarch64, x86_64), Linux (aarch64, x86_64, musl), Windows (x86_64, aarch64)
 - Installers: shell script, Homebrew ([toshimaru/homebrew-torch](https://github.com/toshimaru/homebrew-torch))
 - CI: GitHub Actions, runs plan on PRs
