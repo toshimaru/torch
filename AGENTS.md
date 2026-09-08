@@ -17,7 +17,7 @@ Entrypoint and tests: [src/main.rs](src/main.rs). Package metadata and dependenc
 
 Single-file CLI tool (`src/main.rs`) that combines `mkdir -p` and `touch`. Given a path like `a/b/c.txt`, it creates intermediate directories then creates/touches the file. A path with a trailing separator (`a/b/`) is treated as a directory and created in full.
 
-Core functions: `mkdir_touch` (orchestrator), `mkdir` (creates directories via `create_dir_all`), `touch` (creates file or updates timestamps).
+Core functions: `mkdir_touch` (orchestrator; creates directories via `create_dir_all`), `touch` (creates file or updates timestamps).
 
 Dependencies: `clap` (CLI parsing with derive), `filetime` (timestamp manipulation).
 
