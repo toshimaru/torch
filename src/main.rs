@@ -36,7 +36,7 @@ fn mkdir_touch(path: &str) -> bool {
 
     // Create the directories
     if let Some(dir) = dir
-        && let Err(e) = mkdir(dir)
+        && let Err(e) = create_dir_all(dir)
     {
         eprintln!("Error creating a directory({}): {}", dir.display(), e);
         return false;
@@ -49,10 +49,6 @@ fn mkdir_touch(path: &str) -> bool {
     }
 
     true
-}
-
-fn mkdir(dir: &Path) -> Result<()> {
-    create_dir_all(dir)
 }
 
 fn touch(path: &Path) -> Result<()> {
@@ -106,23 +102,6 @@ mod tests {
         let modified_time = FileTime::from_last_modification_time(&metadata);
         assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
         remove_dir_all(dir).unwrap();
-    }
-
-    #[test]
-    fn test_mkdir_success() {
-        let dir = Path::new("test_mkdir_success");
-        assert!(!dir.exists());
-        assert!(mkdir(dir).is_ok());
-        assert!(dir.exists());
-        remove_dir_all(dir).unwrap();
-    }
-
-    #[test]
-    fn test_mkdir_already_exists() {
-        let existing_dir = Path::new("test_mkdir_already_exists");
-        create_dir_all(existing_dir).unwrap();
-        assert!(mkdir(existing_dir).is_ok());
-        remove_dir_all(existing_dir).unwrap();
     }
 
     #[test]
