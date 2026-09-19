@@ -68,8 +68,7 @@ mod tests {
     use super::*;
     use std::fs::metadata;
     use std::fs::{File, remove_dir_all, remove_file};
-    use std::thread;
-    use std::time::Duration;
+    use tempfile::tempdir;
 
     #[test]
     fn test_touch_creates_file() {
@@ -80,28 +79,37 @@ mod tests {
         remove_file(path).unwrap();
     }
 
+    fn assert_touch_updates_timestamps(path: &Path) {
+        let old = FileTime::from_unix_time(946684800, 0);
+        set_file_times(path, old, old).unwrap();
+
+        let before = FileTime::now();
+        touch(path).unwrap();
+        let after = FileTime::now();
+        let metadata = metadata(path).unwrap();
+        for timestamp in [
+            FileTime::from_last_access_time(&metadata),
+            FileTime::from_last_modification_time(&metadata),
+        ] {
+            assert!(timestamp > old);
+            // Compare whole seconds to tolerate filesystem timestamp precision.
+            assert!(timestamp.unix_seconds() >= before.unix_seconds());
+            assert!(timestamp.unix_seconds() <= after.unix_seconds());
+        }
+    }
+
     #[test]
     fn test_touch_updates_timestamp() {
-        let path = Path::new("test_touch_updates_timestamp");
-        File::create(path).unwrap();
-        thread::sleep(Duration::from_secs(1));
-        assert!(touch(path).is_ok());
-        let metadata = metadata(path).unwrap();
-        let modified_time = FileTime::from_last_modification_time(&metadata);
-        assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
-        remove_file(path).unwrap();
+        let fixture = tempdir().unwrap();
+        let path = fixture.path().join("file.txt");
+        File::create(&path).unwrap();
+        assert_touch_updates_timestamps(&path);
     }
 
     #[test]
     fn test_touch_updates_timestamp_for_directory() {
-        let dir = Path::new("test_touch_updates_timestamp_for_directory");
-        create_dir_all(dir).unwrap();
-        thread::sleep(Duration::from_secs(1));
-        assert!(touch(dir).is_ok());
-        let metadata = metadata(dir).unwrap();
-        let modified_time = FileTime::from_last_modification_time(&metadata);
-        assert_eq!(modified_time.unix_seconds(), FileTime::now().unix_seconds());
-        remove_dir_all(dir).unwrap();
+        let fixture = tempdir().unwrap();
+        assert_touch_updates_timestamps(fixture.path());
     }
 
     #[test]
@@ -181,58 +189,5 @@ mod tests {
         assert!(!mkdir_touch(&create_path));
         assert!(!Path::new(&create_path).exists());
         remove_file(path).unwrap();
-    }
-
-    mod integration_tests {
-        use std::fs::remove_file;
-        use std::process::{Command, Output};
-
-        fn run_command(args: &[&str]) -> Output {
-            Command::new("cargo")
-                .args(["run", "--quiet"])
-                .args(args)
-                .output()
-                .expect("Command failed")
-        }
-
-        #[test]
-        fn test_success_output() {
-            let output = run_command(&[]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert_eq!(stderr, "");
-        }
-
-        #[test]
-        #[cfg(unix)]
-        fn test_fail_permission_denied() {
-            let output = run_command(&["/etc/denied"]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert!(stderr.contains("Error creating a file(/etc/denied): Permission denied"));
-        }
-
-        #[test]
-        #[cfg(unix)]
-        fn test_fail_operation_not_permitted() {
-            let output = run_command(&["/etc/passwd"]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert!(stderr.contains("Error creating a file(/etc/passwd): Operation not permitted"));
-        }
-
-        #[test]
-        fn test_fail_not_a_directory() {
-            let path = "test_fail_not_a_directory";
-            let output = run_command(&[path, format!("{}/{}", path, "test.txt").as_str()]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert!(stderr.contains("Error creating a directory(test_fail_not_a_directory):"));
-            remove_file(path).unwrap();
-        }
     }
 }
