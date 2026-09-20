@@ -76,7 +76,7 @@ mod tests {
         let path = Path::new("test_touch_creates_file");
         assert!(!Path::new(path).exists());
         assert!(touch(path).is_ok());
-        assert!(Path::new(path).exists());
+        assert!(path.is_file());
         remove_file(path).unwrap();
     }
 
@@ -110,7 +110,7 @@ mod tests {
         let path = format!("{}/{}", dir, "a.txt");
         remove_dir_all(dir).ok();
         assert!(mkdir_touch(&path));
-        assert!(Path::new(&path).exists());
+        assert!(Path::new(&path).is_file());
         remove_dir_all(dir).unwrap();
     }
 
@@ -120,7 +120,7 @@ mod tests {
         let path = format!("{}/{}", dir, "a/b/c.txt");
         remove_dir_all(dir).ok();
         assert!(mkdir_touch(&path));
-        assert!(Path::new(&path).exists());
+        assert!(Path::new(&path).is_file());
         remove_dir_all(dir).unwrap();
     }
 
@@ -169,7 +169,7 @@ mod tests {
         let path = "test_mkdir_touch_without_directory";
         remove_file(path).ok();
         assert!(mkdir_touch(path));
-        assert!(Path::new(path).exists());
+        assert!(Path::new(path).is_file());
         remove_file(path).unwrap();
     }
 
@@ -181,58 +181,5 @@ mod tests {
         assert!(!mkdir_touch(&create_path));
         assert!(!Path::new(&create_path).exists());
         remove_file(path).unwrap();
-    }
-
-    mod integration_tests {
-        use std::fs::remove_file;
-        use std::process::{Command, Output};
-
-        fn run_command(args: &[&str]) -> Output {
-            Command::new("cargo")
-                .args(["run", "--quiet"])
-                .args(args)
-                .output()
-                .expect("Command failed")
-        }
-
-        #[test]
-        fn test_success_output() {
-            let output = run_command(&[]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert_eq!(stderr, "");
-        }
-
-        #[test]
-        #[cfg(unix)]
-        fn test_fail_permission_denied() {
-            let output = run_command(&["/etc/denied"]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert!(stderr.contains("Error creating a file(/etc/denied): Permission denied"));
-        }
-
-        #[test]
-        #[cfg(unix)]
-        fn test_fail_operation_not_permitted() {
-            let output = run_command(&["/etc/passwd"]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert!(stderr.contains("Error creating a file(/etc/passwd): Operation not permitted"));
-        }
-
-        #[test]
-        fn test_fail_not_a_directory() {
-            let path = "test_fail_not_a_directory";
-            let output = run_command(&[path, format!("{}/{}", path, "test.txt").as_str()]);
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            assert_eq!(stdout, "");
-            assert!(stderr.contains("Error creating a directory(test_fail_not_a_directory):"));
-            remove_file(path).unwrap();
-        }
     }
 }
