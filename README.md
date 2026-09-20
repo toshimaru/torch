@@ -29,13 +29,15 @@ Given one or more paths, `torch`:
 - creates missing parent directories
 - creates the target file if it does not exist
 - creates the path itself as a directory when it ends with a `/` (or `\` on Windows)
-- updates the access and modification times if it already exists
-- exits with a non-zero status if any path fails
+- updates access and modification times for files and directories, preserving existing file contents
+- continues processing the remaining paths if a path fails, reports errors to stderr, and exits with status 1 if any path fails
+
+Successful operations produce no output.
 
 ## Usage
 
 ```console
-$ torch <PATH>...
+$ torch <PATHS>...
 ```
 
 Examples:
@@ -97,6 +99,21 @@ Run the test suite:
 
 ```console
 $ cargo test
+```
+
+Unit tests live in `src/main.rs`; CLI integration tests live in `tests/cli.rs`. To run only the CLI integration tests:
+
+```console
+$ cargo test --test cli
+```
+
+The Unix permission tests expect an unprivileged user and use `/etc/denied` and `/etc/passwd`. Restricted sandboxes may return different OS errors and cause those assertions to fail.
+
+Check formatting and lint as in CI:
+
+```console
+$ cargo fmt --all -- --check
+$ cargo clippy --all-targets -- -D warnings
 ```
 
 Run the CLI locally:
