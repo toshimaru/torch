@@ -10,17 +10,25 @@ fn run_command(args: &[&str]) -> Output {
 }
 
 #[test]
+fn test_no_paths_shows_usage() {
+    let output = run_command(&[]);
+    assert_eq!(output.status.code(), Some(2));
+    assert!(output.stdout.is_empty());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Usage: torch <PATHS>..."));
+    assert!(stderr.contains("required arguments were not provided"));
+}
+
+#[test]
 fn test_success_output() {
     let dir = "test_success_output";
     let file = format!("{dir}/nested/file.txt");
     let directory = format!("{dir}/directory/");
 
-    for args in [&[][..], &[file.as_str(), directory.as_str()][..]] {
-        let output = run_command(args);
-        assert_eq!(output.status.code(), Some(0));
-        assert!(output.stdout.is_empty());
-        assert!(output.stderr.is_empty());
-    }
+    let output = run_command(&[file.as_str(), directory.as_str()]);
+    assert_eq!(output.status.code(), Some(0));
+    assert!(output.stdout.is_empty());
+    assert!(output.stderr.is_empty());
 
     assert!(Path::new(&file).is_file());
     assert!(Path::new(&directory).is_dir());
