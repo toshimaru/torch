@@ -11,6 +11,7 @@ fn run_command(args: &[&str]) -> Output {
 #[test]
 fn test_success_output() {
     let output = run_command(&[]);
+    assert_eq!(output.status.code(), Some(0));
     assert!(output.stdout.is_empty());
     assert!(output.stderr.is_empty());
 }
@@ -19,6 +20,7 @@ fn test_success_output() {
 #[cfg(unix)]
 fn test_fail_permission_denied() {
     let output = run_command(&["/etc/denied"]);
+    assert_eq!(output.status.code(), Some(1));
     assert!(output.stdout.is_empty());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Error creating a file(/etc/denied): Permission denied"));
@@ -28,6 +30,7 @@ fn test_fail_permission_denied() {
 #[cfg(unix)]
 fn test_fail_operation_not_permitted() {
     let output = run_command(&["/etc/passwd"]);
+    assert_eq!(output.status.code(), Some(1));
     assert!(output.stdout.is_empty());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Error creating a file(/etc/passwd): Operation not permitted"));
@@ -37,6 +40,7 @@ fn test_fail_operation_not_permitted() {
 fn test_fail_not_a_directory() {
     let path = "test_fail_not_a_directory";
     let output = run_command(&[path, format!("{}/{}", path, "test.txt").as_str()]);
+    assert_eq!(output.status.code(), Some(1));
     assert!(output.stdout.is_empty());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Error creating a directory(test_fail_not_a_directory):"));
