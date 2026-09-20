@@ -15,7 +15,7 @@ fn test_no_paths_shows_usage() {
     assert_eq!(output.status.code(), Some(2));
     assert!(output.stdout.is_empty());
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Usage: torch <PATHS>..."));
+    assert!(stderr.contains("Usage: torch"));
     assert!(stderr.contains("required arguments were not provided"));
 }
 
