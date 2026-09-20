@@ -1,4 +1,5 @@
-use std::fs::remove_file;
+use std::fs::{remove_dir_all, remove_file};
+use std::path::Path;
 use std::process::{Command, Output};
 
 fn run_command(args: &[&str]) -> Output {
@@ -10,10 +11,20 @@ fn run_command(args: &[&str]) -> Output {
 
 #[test]
 fn test_success_output() {
-    let output = run_command(&[]);
-    assert_eq!(output.status.code(), Some(0));
-    assert!(output.stdout.is_empty());
-    assert!(output.stderr.is_empty());
+    let dir = "test_success_output";
+    let file = format!("{dir}/nested/file.txt");
+    let directory = format!("{dir}/directory/");
+
+    for args in [&[][..], &[file.as_str(), directory.as_str()][..]] {
+        let output = run_command(args);
+        assert_eq!(output.status.code(), Some(0));
+        assert!(output.stdout.is_empty());
+        assert!(output.stderr.is_empty());
+    }
+
+    assert!(Path::new(&file).is_file());
+    assert!(Path::new(&directory).is_dir());
+    remove_dir_all(dir).unwrap();
 }
 
 #[test]
@@ -44,5 +55,6 @@ fn test_fail_not_a_directory() {
     assert!(output.stdout.is_empty());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Error creating a directory(test_fail_not_a_directory):"));
+    assert!(Path::new(path).is_file());
     remove_file(path).unwrap();
 }

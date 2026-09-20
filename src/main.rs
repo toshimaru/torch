@@ -76,7 +76,7 @@ mod tests {
         let path = Path::new("test_touch_creates_file");
         assert!(!Path::new(path).exists());
         assert!(touch(path).is_ok());
-        assert!(Path::new(path).exists());
+        assert!(path.is_file());
         remove_file(path).unwrap();
     }
 
@@ -110,7 +110,7 @@ mod tests {
         let path = format!("{}/{}", dir, "a.txt");
         remove_dir_all(dir).ok();
         assert!(mkdir_touch(&path));
-        assert!(Path::new(&path).exists());
+        assert!(Path::new(&path).is_file());
         remove_dir_all(dir).unwrap();
     }
 
@@ -120,7 +120,7 @@ mod tests {
         let path = format!("{}/{}", dir, "a/b/c.txt");
         remove_dir_all(dir).ok();
         assert!(mkdir_touch(&path));
-        assert!(Path::new(&path).exists());
+        assert!(Path::new(&path).is_file());
         remove_dir_all(dir).unwrap();
     }
 
@@ -169,7 +169,7 @@ mod tests {
         let path = "test_mkdir_touch_without_directory";
         remove_file(path).ok();
         assert!(mkdir_touch(path));
-        assert!(Path::new(path).exists());
+        assert!(Path::new(path).is_file());
         remove_file(path).unwrap();
     }
 
