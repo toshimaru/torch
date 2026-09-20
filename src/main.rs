@@ -7,6 +7,7 @@ use std::path::Path;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    #[arg(required = true)]
     paths: Vec<String>,
 }
 
