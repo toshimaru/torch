@@ -7,6 +7,8 @@
 
 It creates parent directories when needed, then creates the file.
 
+![torch](assets/og-image.jpg)
+
 ## Why
 
 Creating a file in a nested path usually takes two commands:
