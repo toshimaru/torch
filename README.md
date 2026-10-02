@@ -3,6 +3,8 @@
 
 # torch
 
+![torch](assets/og-image.jpg)
+
 `torch` is a small CLI that combines `mkdir -p` and `touch`.
 
 It creates parent directories when needed, then creates the file.
